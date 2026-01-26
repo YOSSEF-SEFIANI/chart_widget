@@ -13,35 +13,35 @@ import {
   type DataSourceJson,
   AppMode,
   dataSourceUtils,
-} from "jimu-core"
-import { builderActions, type AllWidgetSettingProps } from "jimu-for-builder"
-import { defaultMessages as jimUiMessages } from "jimu-ui"
-import { Switch, NumericInput, TextInput, Select, Option } from "jimu-ui"
+} from "jimu-core";
+import { builderActions, type AllWidgetSettingProps } from "jimu-for-builder";
+import { defaultMessages as jimUiMessages } from "jimu-ui";
+import { Switch, NumericInput, TextInput, Select, Option } from "jimu-ui";
 import {
   SettingRow,
   SettingSection,
-} from "jimu-ui/advanced/setting-components"
-import { DataSourceSelector } from "jimu-ui/advanced/data-source-selector"
+} from "jimu-ui/advanced/setting-components";
+import { DataSourceSelector } from "jimu-ui/advanced/data-source-selector";
 import type {
   ChartComponentOptions,
   ChartMessages,
   ChartTools,
   IMConfig,
   IWebChart,
-} from "../config"
-import { ChartSettings } from "./settings"
-import defaultMessages from "./translations/default"
-import { getSeriesType } from "jimu-ui/advanced/chart"
-import OutputSourceManager from "./data-source"
-import { getDefaultTools, isGaugeChart } from "../utils/default"
-import { DefaultOptions } from "../constants"
+} from "../config";
+import { ChartSettings } from "./settings";
+import defaultMessages from "./translations/default";
+import { getSeriesType } from "jimu-ui/advanced/chart";
+import OutputSourceManager from "./data-source";
+import { getDefaultTools, isGaugeChart } from "../utils/default";
+import { DefaultOptions } from "../constants";
 
-const SupportImageryLayer = false
+const SupportImageryLayer = false;
 
 const ImageryTypes = [
   DataSourceTypes.OrientedImageryLayer,
   DataSourceTypes.ImageryLayer,
-]
+];
 
 const SUPPORTED_TYPES = Immutable(
   [
@@ -50,14 +50,14 @@ const SUPPORTED_TYPES = Immutable(
     DataSourceTypes.BuildingComponentSubLayer,
     DataSourceTypes.SubtypeSublayer,
   ].concat(SupportImageryLayer ? ImageryTypes : []),
-)
+);
 
 const getDefaultToolsOption = (seriesType?: string) => {
-  const isGauge = isGaugeChart(seriesType)
-  return isGauge ? { cursorEnable: false } : { cursorEnable: true }
-}
+  const isGauge = isGaugeChart(seriesType);
+  return isGauge ? { cursorEnable: false } : { cursorEnable: true };
+};
 
-type SettingProps = AllWidgetSettingProps<IMConfig>
+type SettingProps = AllWidgetSettingProps<IMConfig>;
 
 const Setting = (props: SettingProps): React.ReactElement => {
   const {
@@ -66,134 +66,133 @@ const Setting = (props: SettingProps): React.ReactElement => {
     outputDataSources: propOutputDataSources,
     onSettingChange,
     label,
-  } = props
+  } = props;
 
   // ✅ Fix ExB bug: props.config peut être undefined au premier rendu
-  const propConfig = props.config || ({} as IMConfig)
+  const propConfig = props.config || ({} as IMConfig);
 
   const translate = hooks.useTranslation(
     defaultMessages,
     jimUiMessages,
     jimuCoreMessages,
-  )
+  );
 
   const {
     template = "",
     webChart,
     tools: propTools,
     options = DefaultOptions,
-  } = propConfig
-  const seriesType = getSeriesType(webChart?.series as any) ?? "barSeries"
-  const outputDataSourceId = propOutputDataSources?.[0] ?? ""
-  const outputDataSourceLabel = translate("outputStatistics", { name: label })
-  const tools = propTools ?? getDefaultTools(seriesType)
-  const messages = propConfig.messages
+  } = propConfig;
+  const seriesType = getSeriesType(webChart?.series as any) ?? "barSeries";
+  const outputDataSourceId = propOutputDataSources?.[0] ?? "";
+  const outputDataSourceLabel = translate("outputStatistics", { name: label });
+  const tools = propTools ?? getDefaultTools(seriesType);
+  const messages = propConfig.messages;
 
   const handleUseDataSourceChange = (useDataSources: UseDataSource[]): void => {
-    const dataSourceId = propUseDataSources?.[0]?.dataSourceId
-    const newDataSourceId = useDataSources?.[0]?.dataSourceId
-    let config = propConfig
-    if (
-      !dataSourceUtils.areDerivedFromSameMain(dataSourceId, newDataSourceId)
-    ) {
+    const dataSourceId = propUseDataSources?.[0]?.dataSourceId;
+    const newDataSourceId = useDataSources?.[0]?.dataSourceId;
+    let config = propConfig;
+    // Si la source de données change, réinitialiser la config du chart
+    if (dataSourceId !== newDataSourceId) {
       config = propConfig
         .without("webChart")
         .without("tools")
-        .without("template")
+        .without("template");
     }
     if (outputDataSourceId) {
       let outputDataSourceJson =
         getAppStore().getState().appStateInBuilder.appConfig.dataSources[
           outputDataSourceId
-        ]
+        ];
       outputDataSourceJson = outputDataSourceJson.set(
         "originDataSources",
         useDataSources,
-      )
+      );
       onSettingChange({ id, useDataSources, config }, [
         outputDataSourceJson.asMutable({ deep: true }),
-      ])
+      ]);
     } else {
-      onSettingChange({ id, useDataSources, config })
+      onSettingChange({ id, useDataSources, config });
     }
-  }
+  };
 
   const handleOutputCreate = (dataSourceJson: DataSourceJson) => {
-    onSettingChange({ id }, [dataSourceJson])
-  }
+    onSettingChange({ id }, [dataSourceJson]);
+  };
 
   const handleFieldsChange = (fields: string[]) => {
     const useDataSources = Immutable.setIn(
       propUseDataSources,
       ["0", "fields"],
       fields,
-    ).asMutable({ deep: true })
-    onSettingChange({ id, useDataSources })
-  }
+    ).asMutable({ deep: true });
+    onSettingChange({ id, useDataSources });
+  };
 
   const handleTemplateChange = (
     templateId: string,
     webChart: ImmutableObject<IWebChart>,
   ): void => {
-    const seriesType = getSeriesType(webChart.series as any)
+    const seriesType = getSeriesType(webChart.series as any);
     const config = propConfig
       .set("template", templateId)
       .set("webChart", webChart)
-      .set("tools", getDefaultToolsOption(seriesType))
-    onSettingChange({ id, config })
-  }
+      .set("tools", getDefaultToolsOption(seriesType));
+    onSettingChange({ id, config });
+  };
 
   //Update output ds label when the label of widget changes
   React.useEffect(() => {
     const outputDataSource =
       getAppStore().getState().appStateInBuilder.appConfig?.dataSources?.[
         outputDataSourceId
-      ]
+      ];
     if (outputDataSource && outputDataSource.label !== outputDataSourceLabel) {
       onSettingChange({ id }, [
         { id: outputDataSourceId, label: outputDataSourceLabel },
-      ])
+      ]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [outputDataSourceLabel])
+  }, [outputDataSourceLabel]);
 
   React.useEffect(() => {
     const isExpressMode =
       getAppStore().getState().appStateInBuilder?.appRuntimeInfo.appMode ===
-      AppMode.Express
+      AppMode.Express;
     if (isExpressMode) {
       getAppStore().dispatch(
         builderActions.changeMessageActionSettingOpenState(id, false),
-      )
+      );
     }
-  }, [id])
+  }, [id]);
 
   const handleWebChartChange = (webChart: ImmutableObject<IWebChart>): void => {
-    const config = propConfig.set("webChart", webChart)
-    onSettingChange({ id, config })
-  }
+    const config = propConfig.set("webChart", webChart);
+    onSettingChange({ id, config });
+  };
 
   const handleToolsChange = (tools: ImmutableObject<ChartTools>): void => {
-    onSettingChange({ id, config: propConfig.set("tools", tools) })
-  }
+    onSettingChange({ id, config: propConfig.set("tools", tools) });
+  };
 
   const handleOptionsChange = (
     options: ImmutableObject<ChartComponentOptions>,
   ): void => {
-    onSettingChange({ id, config: propConfig.set("options", options) })
-  }
+    onSettingChange({ id, config: propConfig.set("options", options) });
+  };
 
   const handleMessagesChange = (
     messages: ImmutableObject<ChartMessages>,
   ): void => {
-    let config = propConfig
+    let config = propConfig;
     if (messages) {
-      config = propConfig.set("messages", messages)
+      config = propConfig.set("messages", messages);
     } else {
-      config = propConfig.without("messages")
+      config = propConfig.without("messages");
     }
-    onSettingChange({ id, config })
-  }
+    onSettingChange({ id, config });
+  };
 
   // ============================================================================
   // GESTION DU TITRE DYNAMIQUE
@@ -207,16 +206,16 @@ const Setting = (props: SettingProps): React.ReactElement => {
       filterSeparator: ", ",
       useShortAliases: true,
       titleFormat: "narratif",
-    })
+    });
 
   const handleDynamicTitleChange = (field: string, value: any) => {
     const newConfig = Immutable.setIn(
       propConfig,
       ["dynamicTitleConfig", field],
       value,
-    )
-    onSettingChange({ id, config: newConfig })
-  }
+    );
+    onSettingChange({ id, config: newConfig });
+  };
 
   return (
     <div className="widget-setting-chart jimu-widget-setting">
@@ -271,7 +270,7 @@ const Setting = (props: SettingProps): React.ReactElement => {
               <Switch
                 checked={Boolean(dynamicTitleConfig.enabled ?? true)}
                 onChange={(evt) => {
-                  handleDynamicTitleChange("enabled", evt.target.checked)
+                  handleDynamicTitleChange("enabled", evt.target.checked);
                 }}
               />
             </div>
@@ -293,7 +292,7 @@ const Setting = (props: SettingProps): React.ReactElement => {
                       handleDynamicTitleChange(
                         "showFilters",
                         (evt.target as HTMLInputElement).checked,
-                      )
+                      );
                     }}
                   />
                 </div>
@@ -321,7 +320,7 @@ const Setting = (props: SettingProps): React.ReactElement => {
                         handleDynamicTitleChange(
                           "titleFormat",
                           (evt.target as HTMLSelectElement).value,
-                        )
+                        );
                       }}
                     >
                       <Option value="simple">
@@ -374,7 +373,7 @@ const Setting = (props: SettingProps): React.ReactElement => {
                       min={1}
                       max={5}
                       onChange={(value: number | undefined) => {
-                        handleDynamicTitleChange("maxFilters", value || 2)
+                        handleDynamicTitleChange("maxFilters", value || 2);
                       }}
                       showHandlers
                     />
@@ -399,7 +398,7 @@ const Setting = (props: SettingProps): React.ReactElement => {
                         handleDynamicTitleChange(
                           "filterSeparator",
                           (evt.target as HTMLInputElement).value,
-                        )
+                        );
                       }}
                       placeholder="Ex: , ou / ou -"
                     />
@@ -421,7 +420,7 @@ const Setting = (props: SettingProps): React.ReactElement => {
                           handleDynamicTitleChange(
                             "useShortAliases",
                             (evt.target as HTMLInputElement).checked,
-                          )
+                          );
                         }}
                       />
                     </div>
@@ -458,7 +457,7 @@ const Setting = (props: SettingProps): React.ReactElement => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Setting
+export default Setting;
