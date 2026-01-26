@@ -49,7 +49,7 @@ const completeAxes = (
     return webChart;
   }
   const seriesType = getSeriesType(webChart.series as any);
-  let axes = webChart.axes || Immutable(getDefaultAxes(seriesType as any));
+  let axes = webChart.axes || (getDefaultAxes(seriesType as any) as any);
   if (!isGaugeChart(webChart?.series)) {
     axes = webChart.axes.map((axis) => {
       return axis.grid == null ? axis.set("grid", DefaultGrid) : axis;
@@ -136,7 +136,7 @@ const completeLegend = (
  * @returns {IWebChart}
  */
 const completeChart = (propWebChart: IWebChart): ImmutableObject<IWebChart> => {
-  let webChart = Immutable(propWebChart);
+  let webChart = Immutable.from(propWebChart) as ImmutableObject<IWebChart>;
   webChart = completeVersion(webChart);
   webChart = completeBackgroundColor(webChart);
   webChart = completeSeries(webChart);
