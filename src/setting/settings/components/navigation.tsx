@@ -1,27 +1,29 @@
-import { React, classNames } from "jimu-core";
-import { SettingOutlined } from "jimu-icons/outlined/application/setting";
-import { Button } from "jimu-ui";
+import { React, classNames } from "jimu-core"
+import { Icon } from "jimu-ui"
+import { Button } from "jimu-ui"
+
+const SettingIcon = require("jimu-icons/svg/outlined/application/setting.svg")
 
 export interface NavigationProps {
-  level?: 1 | 2 | 3;
-  title: string;
-  active?: boolean;
-  stickRight?: boolean;
-  onClick: () => void;
-  className?: string;
+  level?: 1 | 2 | 3
+  title: string
+  active?: boolean
+  stickRight?: boolean
+  onClick: () => void
+  className?: string
 }
 
 const getLevelClass = (level: number) => {
   switch (level) {
     case 1:
-      return "text-level-1";
+      return "text-level-1"
     case 2:
-      return "text-level-2";
+      return "text-level-2"
     case 3:
     default:
-      return "text-level-3";
+      return "text-level-3"
   }
-};
+}
 
 export const Navigation = React.forwardRef<HTMLButtonElement, NavigationProps>(
   (props, ref) => {
@@ -32,7 +34,7 @@ export const Navigation = React.forwardRef<HTMLButtonElement, NavigationProps>(
       onClick,
       className,
       stickRight = false,
-    } = props;
+    } = props
 
     return (
       <div
@@ -53,11 +55,11 @@ export const Navigation = React.forwardRef<HTMLButtonElement, NavigationProps>(
           icon
           onClick={onClick}
         >
-          <SettingOutlined />
+          <Icon icon={SettingIcon} size={16} />
         </Button>
       </div>
-    );
+    )
   },
-);
+)
 
-Navigation.displayName = "Navigation";
+Navigation.displayName = "Navigation"
