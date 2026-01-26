@@ -22,40 +22,35 @@ const getLevelClass = (level: number) => {
   }
 };
 
-export const Navigation = React.forwardRef<HTMLButtonElement, NavigationProps>(
-  (props, ref) => {
-    const {
-      level = 3,
-      title,
-      active,
-      onClick,
-      className,
-      stickRight = false,
-    } = props;
+export const Navigation = (props: NavigationProps): React.ReactElement => {
+  const {
+    level = 3,
+    title,
+    active,
+    onClick,
+    className,
+    stickRight = false,
+  } = props;
 
-    return (
-      <div
-        className={classNames(
-          className,
-          "navigation w-100 d-flex align-items-center justify-content-between",
-          getLevelClass(level),
-        )}
+  return (
+    <div
+      className={classNames(
+        className,
+        "navigation w-100 d-flex align-items-center justify-content-between",
+        getLevelClass(level),
+      )}
+    >
+      <span className="title">{title}</span>
+      <Button
+        className={classNames({ "pr-0": stickRight })}
+        aria-label={title}
+        size="sm"
+        type="tertiary"
+        active={active}
+        onClick={onClick}
       >
-        <span className="title">{title}</span>
-        <Button
-          className={classNames({ "pr-0": stickRight })}
-          ref={ref}
-          aria-label={title}
-          size="sm"
-          type="tertiary"
-          active={active}
-          onClick={onClick}
-        >
-          ⚙
-        </Button>
-      </div>
-    );
-  },
-);
-
-Navigation.displayName = "Navigation";
+        ⚙
+      </Button>
+    </div>
+  );
+};
