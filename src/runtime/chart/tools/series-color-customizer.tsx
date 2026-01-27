@@ -1,8 +1,7 @@
 /** @jsx jsx */
-import { React, jsx, css, Immutable } from "jimu-core";
+import { React, jsx, css, Immutable, type ImmutableArray } from "jimu-core";
 import { ThemeColorPicker } from "jimu-ui/basic/color-picker";
 import { useTheme } from "jimu-theme";
-import type { ImmutableArray } from "seamless-immutable";
 
 interface SeriesColorCustomizerProps {
   series: ImmutableArray<any>;
