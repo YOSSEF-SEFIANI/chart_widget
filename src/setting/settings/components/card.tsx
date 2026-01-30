@@ -32,7 +32,7 @@ const useStyle = (vertical: boolean): SerializedStyles => {
       margin-bottom: 0;
     }
     &.active {
-      border: 2px solid var(--sys-color-primary-main);
+      border: 2px solid #005E95;
     }
     &.disabled {
       .wrapper {

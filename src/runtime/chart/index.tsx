@@ -296,8 +296,28 @@ const ChartContent = (
       wc = wc.setIn(["title", "visible"], true)
     }
 
+    // Convertir seriesColors (format category-X) en customColors array pour bar/column charts
+    if (Object.keys(seriesColors).length > 0) {
+      // Trouver les clés de catégorie et les trier par index
+      const categoryKeys = Object.keys(seriesColors)
+        .filter((key) => key.startsWith("category-"))
+        .sort((a, b) => {
+          const indexA = parseInt(a.replace("category-", ""), 10)
+          const indexB = parseInt(b.replace("category-", ""), 10)
+          return indexA - indexB
+        })
+
+      if (categoryKeys.length > 0) {
+        // Créer le tableau de couleurs personnalisées
+        const categoryColors = categoryKeys.map((key) => seriesColors[key])
+        wc = wc.set("customColors", categoryColors)
+        wc = wc.set("colorMatch", false)
+        console.log("🎨 customColors appliqué pour bar chart:", categoryColors)
+      }
+    }
+
     return wc
-  }, [propWebChart, series, dynamicTitle])
+  }, [propWebChart, series, dynamicTitle, seriesColors])
 
   // --- LOGIQUE MASQUER LE WIDGET ---
   // Si la dataSource est chargée mais qu'il n'y a pas d'enregistrements (0 records)

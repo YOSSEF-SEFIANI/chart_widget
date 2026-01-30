@@ -491,23 +491,9 @@ export const queryFieldUniqueValues = async (
   const params = getFieldUniqueValuesParams(field, MaxCount);
   const options = scope ? { scope } : null;
   const result = await dataSource.query(params, options);
-  
-  // ✅ Fix: Utiliser getData() pour accéder aux labels de domaines
   let values: Array<number | string> = result.records
-    .map((record): string | number => {
-      const data = record.getData();
-      let value = data?.[field];
-      
-      // Si c'est un champ avec domaine, utiliser le label au lieu de l'ID
-      if (data?.arcgis_charts_type_domain_field_name === field && 
-          data?.arcgis_charts_type_domain_id_label != null) {
-        return data.arcgis_charts_type_domain_id_label;
-      }
-      
-      return value;
-    })
+    .map((record): string | number => record.getFieldValue(field))
     .filter((value) => value !== undefined);
-    
   // For services with a typeIdField, the distinct values returned might be duplicated, manual deduplication is required.
   values = [...new Set(values)];
   return values;
@@ -565,15 +551,16 @@ export const createDefaultSerie = (
     serie.hideOversizedStackedLabels = hideOversizedStackedLabels;
 
     if (fillSymbol) {
-      let color = colorProps?.color;
-      if (!color) {
-        color = getNonRepeatingColor(
+      if (!colorProps?.color && colorProps?.preSerieColor) {
+        const color = getNonRepeatingColor(
           colorProps?.colors ?? SeriesColors,
           index,
-          colorProps?.preSerieColor || "",
+          colorProps.preSerieColor,
         );
+        serie.fillSymbol = { ...fillSymbol, color };
+      } else {
+        serie.fillSymbol = fillSymbol;
       }
-      serie.fillSymbol = { ...fillSymbol, color };
     }
   } else if (type === "lineSeries") {
     const {
@@ -591,19 +578,25 @@ export const createDefaultSerie = (
     serie.showArea = showArea;
     serie.markerVisible = markerVisible;
 
-    let color = colorProps?.color;
-    if (!color) {
-      color = getNonRepeatingColor(
+    if (!colorProps?.color && colorProps?.preSerieColor) {
+      const color = getNonRepeatingColor(
         colorProps?.colors ?? SeriesColors,
         index,
-        colorProps?.preSerieColor || "",
+        colorProps.preSerieColor,
       );
-    }
-    if (lineSymbol) {
-      serie.lineSymbol = { ...lineSymbol, color };
-    }
-    if (markerSymbol) {
-      serie.markerSymbol = { ...markerSymbol, color };
+      if (lineSymbol) {
+        serie.lineSymbol = { ...lineSymbol, color };
+      }
+      if (markerSymbol) {
+        serie.markerSymbol = { ...markerSymbol, color };
+      }
+    } else {
+      if (lineSymbol) {
+        serie.lineSymbol = lineSymbol;
+      }
+      if (markerSymbol) {
+        serie.markerSymbol = markerSymbol;
+      }
     }
   } else if (type === "pieSeries") {
     const {
@@ -615,19 +608,6 @@ export const createDefaultSerie = (
     serie.innerRadius = innerRadius;
     serie.startAngle = startAngle;
     serie.endAngle = endAngle;
-
-    const fillSymbol = serie.fillSymbol;
-    if (fillSymbol) {
-      let color = colorProps?.color;
-      if (!color) {
-        color = getNonRepeatingColor(
-          colorProps?.colors ?? SeriesColors,
-          index,
-          colorProps?.preSerieColor || "",
-        );
-      }
-      serie.fillSymbol = { ...fillSymbol, color };
-    }
   } else if (type === "scatterSeries") {
     const { markerSymbol, overlays } = seriesProps as WebChartScatterplotSeries;
     serie = getDefaultScatterPlotChartSeries();
@@ -882,92 +862,18 @@ export const applySeriesColors = (
   propSeries: ImmutableArray<WebChartSeries>,
   colors: string[],
 ): ImmutableArray<WebChartSeries> => {
-  if (!colors || !colors.length) return propSeries
-
-  const newSeries = (propSeries as any).map((rawSerie, index) => {
-    let serie = Immutable(rawSerie);
-    const type = (serie as any).type ?? (serie as any).get?.('type');
-
-    if (type === 'barSeries' || type === 'histogramSeries') {
-      const color = getColorInOrder(colors, index);
-      if(color){
-        serie = serie.setIn(['fillSymbol', 'color'], color);
-      }
-      // Pour les graphiques en barres, on définit aussi la palette 'colors' sur la série
-      // Cela permet de colorer différemment chaque barre si nécessaire
-      return serie.set('colors', colors);
-    } else if (type === 'lineSeries') {
-      const color = getColorInOrder(colors, index);
-      if(color){
-        serie = serie.setIn(['lineSymbol', 'color'], color);
-        const markerSymbol = (serie as any).markerSymbol ?? (serie as any).get?.('markerSymbol');
-        if (markerSymbol) {
-          serie = serie.setIn(['markerSymbol', 'color'], color);
-        }
-        return serie;
-      }
-    } else if (type === 'pieSeries') {
-      // 1. Appliquer la palette globale à la série (priorité pour les moteurs de rendu dynamiques)
-      serie = serie.set('colors', colors);
-
-      const slices = (serie as any).slices ?? (serie as any).get?.('slices');
-      if (slices && ((slices as any).length > 0 || (slices as any).size > 0)) {
-        const newSlices = (slices as any).map((rawSlice, i) => {
-          const slice = Immutable(rawSlice);
-          const color = getColorInOrder(colors, i);
-          if(color){
-            return slice.setIn(['fillSymbol', 'color'], color);
-          }
-          return slice;
-        });
-        return (serie as any).set('slices', newSlices);
-      } else {
-        // Fallback pour le symbole global de la série
-        const color = getColorInOrder(colors, index);
-        if(color){
-          return serie.setIn(['fillSymbol', 'color'], color);
-        }
-      }
-    } else if (type === 'scatterSeries') {
-      const color = getColorInOrder(colors, index);
-      if(color){
-        return serie.setIn(['markerSymbol', 'color'], color);
-      }
-    }
-    return serie;
-  });
-  return newSeries as unknown as ImmutableArray<WebChartSeries>;
-};
-
-
-/**
- * Apply colors to series based on category map.
- * @param propSeries
- * @param categoryColors Map of category value to color string
- */
-export const applyCategoryColors = (
-  propSeries: ImmutableArray<WebChartSeries>,
-  categoryColors: { [value: string]: string },
-): ImmutableArray<WebChartSeries> => {
-  if (!categoryColors) return propSeries;
-
-  const series = propSeries?.map((serie) => {
-    // The category value is usually the series id or name for split-series
-    const value = serie.id;
-    const color = categoryColors[value];
-
-    if (color) {
-      // Apply color to fillSymbol or lineSymbol
-      const type = (serie as any).type || (serie as any).get?.("type");
-      if (type === "barSeries" || type === "pieSeries") {
-        serie = serie.setIn(["fillSymbol", "color"], color);
-      } else if (type === "lineSeries") {
-        serie = serie.setIn(["lineSymbol", "color"], color);
-      }
+  if (!colors) return;
+  const slices = propSeries?.map((serie, index) => {
+    const color = getColorInOrder(colors, index);
+    const type = serie.type;
+    if (type === "barSeries") {
+      serie = serie.setIn(["fillSymbol", "color"], color);
+    } else if (type === "lineSeries") {
+      serie = serie.setIn(["lineSymbol", "color"], color);
     }
     return serie as any;
   });
-  return series;
+  return slices;
 };
 
 export const createRuntimeSplitBySeries = (

@@ -72,7 +72,7 @@ const style = css`
     height: 40px;
   }
   &.active {
-    border: 2px solid var(--sys-color-primary-light);
+    border: 2px solid #1A73E8;
   }
 `
 

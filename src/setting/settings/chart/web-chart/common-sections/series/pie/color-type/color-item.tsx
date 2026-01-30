@@ -1,10 +1,6 @@
 /**@jsx jsx */
 import { React, jsx, css, classNames, type ImmutableObject, Immutable, hooks } from 'jimu-core'
-import { ThemeColorPicker } from 'jimu-ui/basic/color-picker'
-import { convertStripColors } from '../utils'
 import { Button, defaultMessages } from 'jimu-ui'
-import { getTheme2 } from 'jimu-theme'
-import { SeriesColors } from '../../../../../../../../utils/default'
 import { MinusCircleOutlined } from 'jimu-icons/outlined/editor/minus-circle'
 import type { WebChartPieChartSlice } from 'jimu-ui/advanced/chart'
 import { EditableText } from '../../../../components'
@@ -18,7 +14,40 @@ interface ColorItemProps {
   onDelete?: (sliceId: string) => void
 }
 
-const presetSeriesColors = convertStripColors(SeriesColors)
+// Simple HTML color picker compatible with ExB 1.17
+const SimpleColorPicker: React.FC<{
+  value: string;
+  onChange: (color: string) => void;
+  ariaLabel?: string;
+}> = ({ value, onChange, ariaLabel }) => {
+  const colorInputStyle = css`
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid #BDBDBD;
+    border-radius: 4px;
+    cursor: pointer;
+    background: transparent;
+    
+    &::-webkit-color-swatch-wrapper {
+      padding: 2px;
+    }
+    &::-webkit-color-swatch {
+      border: none;
+      border-radius: 2px;
+    }
+  `;
+
+  return (
+    <input
+      type="color"
+      css={colorInputStyle}
+      value={value && value.startsWith('#') ? value : '#5E8FD0'}
+      onChange={(e) => onChange(e.target.value)}
+      aria-label={ariaLabel}
+    />
+  );
+};
 
 const style = css`
   display: flex;
@@ -42,7 +71,6 @@ export const ColorItem = (props: ColorItemProps): React.ReactElement => {
 
   console.log('ColorItem render:', label, color)
 
-  const appTheme = getTheme2()
   const translate = hooks.useTranslation(defaultMessages)
 
   const handleColorChange = (color: string) => {
@@ -80,7 +108,7 @@ export const ColorItem = (props: ColorItemProps): React.ReactElement => {
     <div css={style} className={classNames('color-item', className)}>
       <div className='editor-text-color'>
         <EditableText className='label text-truncate' editable={editable} value={label} onChange={handleLabelChange}></EditableText>
-        <ThemeColorPicker aria-label={label} disableReset disableAlpha={!deletable} specificTheme={appTheme} presetColors={presetSeriesColors} value={color} onChange={handleColorChange} />
+        <SimpleColorPicker ariaLabel={label} value={color} onChange={handleColorChange} />
       </div>
       {
         deletable && <Button aria-label={translate('remove')} title={translate('remove')} type='tertiary' icon size='sm' onClick={handleDeleteClick}><MinusCircleOutlined size='m' /></Button>

@@ -1,7 +1,7 @@
 /** @jsx jsx */
-import { React, jsx, css, Immutable, type ImmutableArray } from "jimu-core";
-import { ThemeColorPicker } from "jimu-ui/basic/color-picker";
+import { React, jsx, css, type ImmutableArray } from "jimu-core";
 import { useTheme } from "jimu-theme";
+import { ThemeColorPicker } from "jimu-ui/basic/color-picker";
 
 interface SeriesColorCustomizerProps {
   series: ImmutableArray<any>;
@@ -206,14 +206,14 @@ const SeriesColorCustomizer: React.FC<SeriesColorCustomizerProps> = (props) => {
               <ThemeColorPicker
                 specificTheme={theme}
                 value={currentColor}
-                onChange={(color) => handleColorChange(itemId, color)}
+                onChange={(color) => { handleColorChange(itemId, color) }}
               />
 
               {localColors[itemId] && (
                 <button
                   css={resetButtonStyle}
                   title="Réinitialiser"
-                  onClick={() => handleResetColor(itemId)}
+                  onClick={() => { handleResetColor(itemId) }}
                 >
                   ↺
                 </button>

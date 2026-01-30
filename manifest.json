@@ -1,9 +1,9 @@
 {
-  "name": "chartWidget",
+  "name": "chartWidget-v1.17",
   "label": "Chart Widget",
   "type": "widget",
-  "version": "1.19.0",
-  "exbVersion": "1.19.0",
+  "version": "1.17.0",
+  "exbVersion": "1.17.0",
   "author": "Esri R&D Center Beijing",
   "description": "This is the widget used in developer guide",
   "copyright": "",

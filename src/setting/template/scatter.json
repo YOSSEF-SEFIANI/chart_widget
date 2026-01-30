@@ -1,5 +1,5 @@
 {
-  "version": "24.0.0",
+  "version": "17.0.0",
   "id": "scatter",
   "type": "chart",
   "dataSource": {
@@ -50,7 +50,7 @@
         "visible": false,
         "content": {
           "type": "esriTS",
-          "color": "var(--sys-color-surface-paper-text)",
+          "color": "#212121",
           "font": {
             "family": "inherit",
             "size": 14,
@@ -67,7 +67,7 @@
         "visible": true,
         "content": {
           "type": "esriTS",
-          "color": "var(--sys-color-surface-paper-hint)",
+          "color": "#757575",
           "font": {
             "family": "inherit",
             "size": 12,
@@ -91,7 +91,7 @@
       "lineSymbol": {
         "type": "esriSLS",
         "style": "esriSLSSolid",
-        "color": "var(--sys-color-divider-primary)",
+        "color": "#BDBDBD",
         "width": 1
       }
     },
@@ -104,7 +104,7 @@
         "visible": false,
         "content": {
           "type": "esriTS",
-          "color": "var(--sys-color-surface-paper-text)",
+          "color": "#212121",
           "font": {
             "family": "inherit",
             "size": 14,
@@ -121,7 +121,7 @@
         "visible": true,
         "content": {
           "type": "esriTS",
-          "color": "var(--sys-color-surface-paper-hint)",
+          "color": "#757575",
           "font": {
             "family": "inherit",
             "size": 12,
@@ -145,7 +145,7 @@
       "lineSymbol": {
         "type": "esriSLS",
         "style": "esriSLSSolid",
-        "color": "var(--sys-color-divider-primary)",
+        "color": "#BDBDBD",
         "width": 1
       }
     }

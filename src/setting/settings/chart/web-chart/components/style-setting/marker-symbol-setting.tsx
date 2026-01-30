@@ -82,7 +82,7 @@ export const MarkSymbolSetting = (props: MarkSymbolSettingProps): React.ReactEle
           onChange={handleFillColorChange}
           value={color}
         />
-        <div className='divide-line ml-2 mr-2' style={{ backgroundColor: 'var(--sys-color-secondary)' }} />
+        <div className='divide-line ml-2 mr-2' style={{ backgroundColor: '#E0E0E0' }} />
         <Slider
           aria-label={translate('size')}
           min={0}
@@ -102,7 +102,7 @@ export const MarkSymbolSetting = (props: MarkSymbolSettingProps): React.ReactEle
           onChange={handleFillColorChange}
           value={color}
         />
-        <div className='divide-line ml-2 mr-2' style={{ backgroundColor: 'var(--sys-color-secondary)' }} />
+        <div className='divide-line ml-2 mr-2' style={{ backgroundColor: '#E0E0E0' }} />
         <LineSymbolSetting
           type='border'
           presetColors={presetLineColors}

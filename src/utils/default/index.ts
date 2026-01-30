@@ -32,27 +32,28 @@ import type { ChartTools, HistogramOverlaysType, WebChartSeries } from '../../co
 import { PieSliceGroupingSliceId } from '../../constants'
 
 export const DefaultColor = '#5E8FD0'
-export const DefaultBgColor = 'var(--sys-color-surface-paper)'
-export const DefaultTextColor = 'var(--sys-color-surface-paper-text)'
-export const DefaultLineColor = 'var(--sys-color-divider-secondary)'
+// Note: CSS variables replaced with hex colors for ExB 1.17 compatibility
+export const DefaultBgColor = '#FFFFFF'
+export const DefaultTextColor = '#212121'
+export const DefaultLineColor = '#E0E0E0'
 // eslint-disable-next-line jimu-theme/no-improperly-color
-export const DefaultFillColor = 'var(--sys-color-primary-main)'
+export const DefaultFillColor = '#005E95'
 export const DefaultTextSize = 14
 export const DefaultCircleMarkerSize = 10
 export const DefaultFontWeight = 400
 
 // title
-export const DefaultTitleColor = 'var(--sys-color-surface-paper-text)'
+export const DefaultTitleColor = '#212121'
 export const DefaultTitleWeight = 500
 export const DefaultTitleSize = 16
 
 // footer
 export const DefaultFooterSize = 12
-export const DefaultFooterColor = 'var(--sys-color-surface-paper-hint)'
+export const DefaultFooterColor = '#757575'
 
 // series
 export const DefaultSeriesLabelSize = 10
-export const DefaultValueLabelColor = 'var(--sys-color-surface-paper-hint)'
+export const DefaultValueLabelColor = '#757575'
 
 export const SeriesColors = [
   '#5E8FD0',
@@ -74,17 +75,17 @@ export const SeriesColors = [
   '#993300'
 ]
 
-export const DefaultSeriesOutlineColor = 'var(--sys-color-divider-secondary)'
-export const DefaultPieSeriesOutlineColor = 'var(--sys-color-divider-secondary)'
+export const DefaultSeriesOutlineColor = '#E0E0E0'
+export const DefaultPieSeriesOutlineColor = '#E0E0E0'
 export const DefaultScatterPlotTrendLineColor = SeriesColors[2]
 
 // axes
-export const DefaultAxisColor = 'var(--sys-color-divider-primary)'
-export const DefaultAxisLabelColor = 'var(--sys-color-surface-paper-hint)'
-export const DefaultAxisTitleColor = 'var(--sys-color-surface-paper-text)'
+export const DefaultAxisColor = '#BDBDBD'
+export const DefaultAxisLabelColor = '#757575'
+export const DefaultAxisTitleColor = '#212121'
 export const DefaultAxisTitleSize = 14
 export const DefaultAxisLabelSize = 12
-export const DefaultAxisScrollbarColor = 'var(--sys-color-divider-primary)'
+export const DefaultAxisScrollbarColor = '#BDBDBD'
 export const DefaultAxisScrollbarWidth = 10
 export const DefaultAxisScrollbarGridSize = 20
 export const DefaultAxisScrollbarMargin = 20
@@ -97,11 +98,11 @@ export const DefaultGuideLabelSize = 12
 // legend
 export const DefaultLegendTitleSize = 14
 export const DefaultLegendLabelSize = 12
-export const DefaultLegendTitleColor = 'var(--sys-color-surface-paper-text)'
-export const DefaultLegendLabelColor = 'var(--sys-color-surface-paper-text)'
+export const DefaultLegendTitleColor = '#212121'
+export const DefaultLegendLabelColor = '#212121'
 export const DefaultPieLegendLabelMaxWidth = 200
 // grid
-export const DefaultGridColor = 'var(--sys-color-divider-tertiary)'
+export const DefaultGridColor = '#F5F5F5'
 // color by slices
 export const DefaultColorBySlicesOtherColor = '#D6D6D6'
 
@@ -114,11 +115,11 @@ export const DefaultSplitByOtherSeriesColor = '#D6D6D6'
 // gauge
 export const DefaultGaugeAxisLabelSize = 12
 export const DefaultGaugeAxisInnerLabelSize = 18
-export const DefaultGaugeAxisColor = 'var(--sys-color-divider-primary)'
-export const DefaultGaugeAxisInnerLabelColor = 'var(--sys-color-surface-paper-text)'
+export const DefaultGaugeAxisColor = '#BDBDBD'
+export const DefaultGaugeAxisInnerLabelColor = '#212121'
 // eslint-disable-next-line jimu-theme/no-improperly-color
-export const DefaultGaugeNeedleColor = 'var(--sys-color-primary-main)'
-export const DefaultGaugeNeedleOutlineColor = 'var(--sys-color-divider-secondary)'
+export const DefaultGaugeNeedleColor = '#005E95'
+export const DefaultGaugeNeedleOutlineColor = '#E0E0E0'
 
 export const getDefaultColor = (): string => {
   return DefaultColor

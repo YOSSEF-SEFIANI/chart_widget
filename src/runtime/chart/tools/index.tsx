@@ -10,6 +10,7 @@ import {
   type DataRecordSet,
   type IMState,
   type DataSource,
+  type DataRecord,
 } from "jimu-core";
 import {
   DataActionList,
@@ -38,6 +39,8 @@ interface ToolsProps {
   onSeriesColorsChange?: (seriesColors: { [serieId: string]: string }) => void;
   currentSeriesColors?: { [serieId: string]: string };
   webChartSeries?: ImmutableArray<any>;
+  chartRecords?: DataRecord[];
+  categoryField?: string;
 }
 
 const Root = styled("div")(({ theme }) => {
@@ -46,11 +49,11 @@ const Root = styled("div")(({ theme }) => {
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-end",
-    color: theme.sys.color.surface.paperText,
+    color: "#212121", // ExB 1.17 compatible
     ".tool-dividing-line": {
       height: "16px",
       width: "1px",
-      backgroundColor: theme.sys.color.divider.primary,
+      backgroundColor: "#BDBDBD", // ExB 1.17 compatible
     },
   };
 });
@@ -69,13 +72,15 @@ const Tools = (props: ToolsProps): React.ReactElement => {
     onSeriesColorsChange,
     currentSeriesColors,
     webChartSeries,
+    chartRecords,
+    categoryField,
   } = props;
 
   const translate = hooks.useTranslation(defaultMessages);
   const widgetLabel =
     getAppStore().getState().appConfig.widgets?.[widgetId]?.label ?? "Chart";
   const dataActionLabel = translate("outputStatistics", { name: widgetLabel });
-  const { outputDataSource, chart } = useChartRuntimeState();
+  const { outputDataSource, chart, records } = useChartRuntimeState();
   const cursorEnable = tools?.cursorEnable ?? true;
 
   const dividerVisible =
@@ -203,6 +208,9 @@ const Tools = (props: ToolsProps): React.ReactElement => {
           >
             <SeriesColorCustomizer
               series={series}
+              chartType={type}
+              chartRecords={records || chartRecords}
+              categoryField={categoryField}
               onSeriesColorsChange={handleSeriesColorsChange}
               currentSeriesColors={currentSeriesColors}
             />

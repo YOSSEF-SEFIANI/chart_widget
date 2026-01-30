@@ -54,7 +54,7 @@ const WebChart = (props: WebChartProps) => {
     currentSeriesColors,
   } = props;
 
-  const { dataSource, outputDataSource, renderStatus } = useChartRuntimeState();
+  const { dataSource, outputDataSource, renderStatus, records } = useChartRuntimeState();
   const dataSourceId = useDataSource?.dataSourceId;
 
   const layer = useDataSourceFeatureLayer<SupportedLayer>(dataSourceId);
@@ -92,6 +92,8 @@ const WebChart = (props: WebChartProps) => {
       onSeriesColorsChange={onSeriesColorsChange}
       currentSeriesColors={currentSeriesColors}
       webChartSeries={webChart?.series}
+      chartRecords={records}
+      categoryField={webChart?.series?.[0]?.x}
     />
   ) : null;
 

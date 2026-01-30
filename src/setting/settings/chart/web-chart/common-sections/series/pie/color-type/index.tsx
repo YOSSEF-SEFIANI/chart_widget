@@ -1,17 +1,51 @@
-import { React, classNames, type ImmutableObject, type ImmutableArray, Immutable, hooks } from 'jimu-core'
+/** @jsx jsx */
+import { React, classNames, type ImmutableObject, type ImmutableArray, Immutable, hooks, jsx, css } from 'jimu-core'
 import { SettingOutlined } from 'jimu-icons/outlined/application/setting'
 import { Button, Label, Radio } from 'jimu-ui'
-import { ThemeColorPicker } from 'jimu-ui/basic/color-picker'
 import defaultMessages from '../../../../../../../translations/default'
 import type { ISimpleFillSymbol, WebChartPieChartSeries, WebChartPieChartSlice } from 'jimu-ui/advanced/chart'
 import { CategoryType, type ChartDataSource, type WebChartSeries } from '../../../../../../../../config'
-import { DefaultColorBySlicesOtherColor, SeriesColors } from '../../../../../../../../utils/default'
-import { convertStripColors, getByFieldPieSlices, type LoadSlices } from '../utils'
+import { DefaultColorBySlicesOtherColor } from '../../../../../../../../utils/default'
+import { getByFieldPieSlices, type LoadSlices } from '../utils'
 import { ColorList } from './color-list'
-import { getTheme2 } from 'jimu-theme'
 import { MaxColorCount } from '../../../../../../../../constants'
 import { getCategoryType } from '../../../../../../../../utils/common'
 import { COLORS_SET } from '../../components'
+
+// Simple HTML color picker compatible with ExB 1.17
+const SimpleColorPicker: React.FC<{
+  value: string;
+  onChange: (color: string) => void;
+  ariaLabel?: string;
+}> = ({ value, onChange, ariaLabel }) => {
+  const colorInputStyle = css`
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid #BDBDBD;
+    border-radius: 4px;
+    cursor: pointer;
+    background: transparent;
+    
+    &::-webkit-color-swatch-wrapper {
+      padding: 2px;
+    }
+    &::-webkit-color-swatch {
+      border: none;
+      border-radius: 2px;
+    }
+  `;
+
+  return (
+    <input
+      type="color"
+      css={colorInputStyle}
+      value={value && value.startsWith('#') ? value : '#5E8FD0'}
+      onChange={(e) => onChange(e.target.value)}
+      aria-label={ariaLabel}
+    />
+  );
+};
 
 interface ColorTypeProps {
   className?: string
@@ -25,8 +59,6 @@ interface ColorTypeProps {
   onColorsChange?: (colors: string[]) => void
 }
 
-const presetSeriesColors = convertStripColors(SeriesColors)
-
 export const ColorType = (props: ColorTypeProps): React.ReactElement => {
   const {
     className,
@@ -39,7 +71,6 @@ export const ColorType = (props: ColorTypeProps): React.ReactElement => {
     loadSlices,
     onColorsChange
   } = props
-  const appTheme = getTheme2()
   const unmountRef = React.useRef<boolean>(false)
   hooks.useUnmount(() => { unmountRef.current = true })
   const translate = hooks.useTranslation(defaultMessages)
@@ -191,11 +222,9 @@ export const ColorType = (props: ColorTypeProps): React.ReactElement => {
             {translate('singleColor')}
           </Label>
           {colorMode === 'singleColor' && (
-            <ThemeColorPicker
+            <SimpleColorPicker
               value={singleColor}
-              specificTheme={appTheme}
-              aria-label={translate('singleColor')}
-              presetColors={presetSeriesColors}
+              ariaLabel={translate('singleColor')}
               onChange={handleSingleColorChange}
             />
           )}

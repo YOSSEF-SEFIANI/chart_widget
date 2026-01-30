@@ -1,5 +1,5 @@
 import { type IMFeatureLayerQueryParams, Immutable, type ImmutableArray, type ImmutableObject, type WidgetUpgradeInfo, WidgetVersionManager } from 'jimu-core'
-import { getSeriesType, type WebChartPieChartSeries, type WebChartPieChartLegend, type WebChartTemporalBinning } from 'jimu-ui/advanced/chart'
+import { getSeriesType, type WebChartPieChartSeries, type WebChartPieChartLegend } from 'jimu-ui/advanced/chart'
 import { CategoryType, type IWebChart, type IMConfig, type WebChartSeries, type WebChartOrderOptions } from './config'
 import { ByFieldSeriesX, ByFieldSeriesY, PieSliceGroupingSliceId } from './constants'
 import { capitalizeString, getCategoryType, getStatisticsType } from './utils/common'
@@ -149,15 +149,7 @@ const moveSeriesRotatedPropToChart = (webChartToUpdate: ImmutableObject<IWebChar
   return updatedWebChart
 }
 
-const EsriTimeUnitsUpgradeMapping = {
-  'esriTimeUnitsSeconds': 'seconds',
-  'esriTimeUnitsMinutes': 'minutes',
-  'esriTimeUnitsHours': 'hours',
-  'esriTimeUnitsDays': 'days',
-  'esriTimeUnitsWeeks': 'weeks',
-  'esriTimeUnitsMonths': 'months',
-  'esriTimeUnitsYears': 'years'
-}
+// NOTE: EsriTimeUnitsUpgradeMapping was removed as it was only used in 1.18.0 upgrader
 
 class VersionManager extends WidgetVersionManager {
   versions = [{
@@ -412,86 +404,9 @@ class VersionManager extends WidgetVersionManager {
       }
       return oldConfig.set('webChart', webChart)
     }
-  }, {
-    version: '1.18.0',
-    description: 'Upgrade the version of webChart to 23.2.0',
-    upgrader: (oldConfig: IMConfig) => {
-      if (!oldConfig?.webChart) return oldConfig
-      let webChart = (oldConfig.webChart as any).set('version', '23.2.0')
-      if (!webChart.series?.length || !webChart.dataSource?.query) return oldConfig.set('webChart', webChart)
-
-      let series = webChart.series
-      let query = webChart.dataSource?.query
-      const seriesType = getSeriesType(series)
-      const categoryType = getCategoryType(query)
-      const statisticsType = getStatisticsType(query)
-      const binTemporalData = series[0].binTemporalData ?? !!series[0].timeIntervalSize
-      if ((seriesType === 'lineSeries' || seriesType === 'barSeries') && categoryType === CategoryType.ByGroup && binTemporalData) {
-        series = series.map((serie) => {
-          const size = serie.timeIntervalSize
-          const unit = serie.timeIntervalUnits
-          const timeAggregationType = serie.timeAggregationType
-          const trimIncompleteTimeInterval = serie.trimIncompleteTimeInterval
-          const nullPolicy = serie.nullPolicy
-
-          const temporalBinning: WebChartTemporalBinning & { type: 'fixedDateBased' } = { type: 'fixedDateBased' }
-          if (typeof size !== 'undefined') {
-            temporalBinning.size = size
-          }
-          if (typeof unit !== 'undefined') {
-            temporalBinning.unit = EsriTimeUnitsUpgradeMapping[unit]
-          }
-          if (typeof timeAggregationType !== 'undefined') {
-            temporalBinning.timeAggregationType = timeAggregationType
-          }
-          if (typeof trimIncompleteTimeInterval !== 'undefined') {
-            temporalBinning.trimIncompleteTimeInterval = trimIncompleteTimeInterval
-          }
-          if (typeof nullPolicy !== 'undefined') {
-            temporalBinning.nullPolicy = nullPolicy
-          }
-          serie = serie.without('timeIntervalSize', 'timeIntervalUnits', 'timeAggregationType', 'trimIncompleteTimeInterval', 'nullPolicy')
-          serie = serie.set('binTemporalData', true)
-          serie = serie.set('temporalBinning', temporalBinning)
-          return serie as unknown as WebChartSeries
-        })
-        webChart = webChart.set('series', series)
-      }
-      if (statisticsType === 'percentile_cont') {
-        query = query.set('outStatistics', query.outStatistics.map((outStatistic) => {
-          const statisticType = outStatistic.statisticType
-          if (statisticType === 'percentile_cont') {
-            outStatistic = outStatistic.set('statisticType', 'percentile-continuous')
-          }
-          return outStatistic
-        }))
-        webChart = webChart.setIn(['dataSource', 'query'], query)
-      }
-      return oldConfig.set('webChart', webChart)
-    }
-  }, {
-    version: '1.19.0',
-    description: 'Upgrade the version of webChart to 24.0.0',
-    upgrader: (oldConfig: IMConfig) => {
-      if (!oldConfig?.webChart) return oldConfig
-      let webChart = (oldConfig.webChart as any).set('version', '24.0.0')
-      if (!webChart.series?.length || !webChart.dataSource?.query) return oldConfig.set('webChart', webChart)
-
-      let series = webChart.series
-      const query = webChart.dataSource?.query
-      const seriesType = getSeriesType(series)
-      const categoryType = getCategoryType(query)
-      const binTemporalData = series[0].binTemporalData && series[0].temporalBinning
-      if ((seriesType === 'lineSeries' || seriesType === 'barSeries') && categoryType === CategoryType.ByGroup && binTemporalData) {
-        series = series.map((serie) => {
-          const temporalBinning = serie.temporalBinning.without('type')
-          return serie.set('temporalBinning', temporalBinning)
-        })
-        webChart = webChart.set('series', series)
-      }
-      return oldConfig.set('webChart', webChart)
-    }
   }]
+  // NOTE: Versions 1.18.0 and 1.19.0 removed for ExB 1.17 compatibility
+  // They use webChart versions 23.2.0 and 24.0.0 which are not supported in ExB 1.17
 }
 
 export const versionManager: WidgetVersionManager = new VersionManager()

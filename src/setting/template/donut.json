@@ -1,5 +1,5 @@
 {
-  "version": "24.0.0",
+  "version": "17.0.0",
   "id": "donut",
   "type": "chart",
   "dataSource": {
@@ -32,7 +32,7 @@
           "outline": {
             "type": "esriSLS",
             "style": "esriSLSSolid",
-            "color": "var(--sys-color-divider-secondary)",
+            "color": "#E0E0E0",
             "width": 1
           }
         }
@@ -60,7 +60,7 @@
         "visible": false,
         "content": {
           "type": "esriTS",
-          "color": "var(--sys-color-surface-paper-hint)",
+          "color": "#757575",
           "font": {
             "family": "inherit",
             "size": 10,
@@ -79,7 +79,7 @@
         "outline": {
           "type": "esriSLS",
           "style": "esriSLSSolid",
-          "color": "var(--sys-color-divider-secondary)",
+          "color": "#E0E0E0",
           "width": 1
         }
       }

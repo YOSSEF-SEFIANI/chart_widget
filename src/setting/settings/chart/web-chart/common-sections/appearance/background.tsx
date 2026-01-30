@@ -1,5 +1,5 @@
 import { React, hooks } from 'jimu-core'
-import { getTheme2 } from 'jimu-theme'
+import { useTheme2 } from 'jimu-theme'
 import { defaultMessages } from 'jimu-ui'
 import { SettingRow } from 'jimu-ui/advanced/setting-components'
 import { ThemeColorPicker } from 'jimu-ui/basic/color-picker'
@@ -14,7 +14,7 @@ export const Background = (props: BackgroundProps) => {
 
   const translate = hooks.useTranslation(defaultMessages)
 
-  const appTheme = getTheme2()
+  const appTheme = useTheme2()
 
   return (
     <SettingRow label={translate('background')} flow='no-wrap' className='mt-2'>

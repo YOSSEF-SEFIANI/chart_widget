@@ -20,10 +20,10 @@ const useStyle = (): SerializedStyles => {
   return React.useMemo(
     () => css`
     .jimu-button-outlined-primary {
-      color: ${theme?.sys.color.primary.light};
+      color: #1A73E8; /* ExB 1.17 compatible */
       font-weight: 500;
       &:hover:not(.active) {
-        color: ${theme?.sys.color.primary.light};
+        color: #1A73E8; /* ExB 1.17 compatible */
       }
     }`,
     [theme]
